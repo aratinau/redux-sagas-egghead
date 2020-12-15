@@ -1,9 +1,16 @@
-import { createStore } from 'redux'
+import { createStore, applyMiddleware } from 'redux'
+import createSagaMiddleware from 'redux-saga'
 
 import reducer from '../reducers'
+import mySaga from './sagas'
 
-export const store = createStore(reducer)
+const sagaMiddleware = createSagaMiddleware()
+
+export const store = createStore(
+    reducer,
+    applyMiddleware(sagaMiddleware)
+)
 
 
-
-
+// run est la glue entre le store et la fonction générique mySaga
+sagaMiddleware.run(mySaga)
