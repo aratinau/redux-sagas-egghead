@@ -72,3 +72,87 @@ fork, comme call, peut être utilisé pour appeler les fonctions normales et Gen
 ## put
 
 demande au middleware de planifier l'envoi d'une action au magasin. Cette répartition peut ne pas être immédiate car d'autres tâches peuvent se trouver en avance dans la file d'attente des tâches de la saga ou être toujours en cours.
+
+# Itérateurs et générateurs
+
+## Itérateurs
+
+Un itérateur est un objet sachant comment accéder aux éléments d'une collection un par un et qui connait leur position dans la collection. En JavaScript, un itérateur expose une méthode next() qui retourne l'élément suivant dans la séquence. Cette méthode renvoie un objet possédant deux propriétés : done et value.
+
+## Itérables
+
+Un objet est considéré comme itérable s'il définit le comportement qu'il aura lors de l'itération (par exemple les valeurs qui seront utilisées dans une boucle for...of). Certains types natifs, tels qu'Array ou Map, possède un comportement par défaut pour les itérations, cependant d'autres types comme les Objets, ne possèdent pas ce comportement.
+
+## Générateurs
+
+Les itérateurs personnalisés sont un outil utile mais leur création peut s'avérer complexe et il faut maintenir leur état interne. Avec les générateurs, on peut définir une seule fonction qui est un algorithme itératif et qui peut maintenir son état.
+
+Un générateur est un type de fonction spécial qui fonctionne comme une fabrique (factory) d'itérateurs. Une fonction devient un générateur lorsqu'elle contient une ou plusieurs expressions yield et qu'elle utilise la syntaxe function*.
+
+### function*
+
+La déclaration function* permet de définir un générateur (un générateur est un objet Generator). Les générateurs sont des fonctions qu'il est possible de quitter puis de reprendre.
+
+```js
+function* generator(i) {
+  yield i;
+  yield i + 10;
+}
+
+const gen = generator(10);
+
+console.log(gen.next().value);
+// expected output: 10
+
+console.log(gen.next().value);
+// expected output: 20
+```
+
+L'objet Generator est renvoyé par une fonction génératrice, c'est à la fois un itérateur et un itérable.
+
+```js
+function* gen() {
+  yield 1;
+  yield 2;
+  yield 3;
+}
+
+var g = gen(); // "Generator { }"
+```
+
+### yield
+
+Le mot-clé yield est utilisé pour suspendre et reprendre une fonction génératrice (function* ou une fonction génératrice historique).
+
+```js
+function* foo(index) {
+  while (index < 2) {
+    yield index;
+    index++;
+  }
+}
+
+const iterator = foo(0);
+
+console.log(iterator.next().value);
+// expected output: 0
+
+console.log(iterator.next().value);
+// expected output: 1
+```
+
+Une expression yield* est utilisée afin de déléguer le mécanisme d'itération/génération à un autre générateur ou à un autre objet itérable.
+
+```js
+function* func1() {
+  yield 42;
+}
+
+function* func2() {
+  yield* func1();
+}
+
+const iterator = func2();
+
+console.log(iterator.next().value);
+// expected output: 42
